@@ -1,0 +1,17 @@
+syntax = "proto2";
+package pb;
+option go_package = "./;pb";
+
+message Message {
+  required int32 action = 1;
+  required Dictionary dict = 2;
+}
+
+message Pair {
+  required string key = 1;
+  required bytes value = 2;
+}
+
+message Dictionary {
+  repeated Pair pairs = 1;
+}
