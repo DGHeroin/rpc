@@ -49,9 +49,8 @@ func (s *Server) handleConn(conn net.Conn) {
     c.OnMessage = func(msgType byte, msg *pb.Message) {
         switch msgType {
         case 1:
-            if reply, err := s.servant.handleRequest(msg); err == nil {
-                _ = c.Send(2, reply)
-            }
+            reply := s.servant.handleRequest(msg)
+            _ = c.Send(2, reply)
         }
     }
 

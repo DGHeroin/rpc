@@ -19,18 +19,18 @@ func sendRequest(client *rpc.Client) {
         reply shard.SimpleReply
     )
     req.ActionName = "I want to say hello"
-    client.Call(context.Background(), "service.hello", &req, &reply)
+    err := client.Call(context.Background(), "service.hello", &req, &reply)
     atomic.AddUint32(&count, 1)
-    //log.Println(err, reply.Message)
+    log.Println(err, reply.Message)
 }
 func openOneClient()  {
     client := rpc.NewP2PClient("127.0.0.1:1600")
     for {
        sendRequest(client)
+       time.Sleep(time.Second)
     }
 }
 func main() {
-
     go func() {
         lastVal := uint32(0)
         for {
@@ -40,7 +40,7 @@ func main() {
             lastVal = now
         }
     }()
-    for i := 0; i < 100; i++ {
+    for i := 0; i < 2; i++ {
         openOneClient()
     }
     select {

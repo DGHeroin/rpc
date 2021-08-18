@@ -43,6 +43,10 @@ func (client *Client) GetConn() (*Conn, error) {
     client.conn = NewConn(conn, &client.waitGroup)
     client.conn.OnMessage = client.handleMessage
     client.conn.Do()
+    client.conn.OnClose = func(conn *Conn) {
+        log.Println("关闭连接...")
+        client.conn = nil
+    }
     return client.conn, nil
 }
 
@@ -50,7 +54,8 @@ func (client *Client) handleMessage(msgType byte, msg *pb.Message) {
     switch msgType {
     case 0: // 心跳
     case 1: // request
-        client.servant.handleRequest(msg)
+        reply := client.servant.handleRequest(msg)
+        client.conn.Send(2, reply)
     case 2: // response
         call := client.mgr.popCall(*msg.Id)
         if call == nil {

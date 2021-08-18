@@ -2,7 +2,6 @@ package rpc
 
 import (
     "bytes"
-    "context"
     "encoding/binary"
     "fmt"
     "github.com/DGHeroin/rpc/pb"
@@ -167,7 +166,7 @@ func makePkt(typeCode byte, msg *pb.Message) ([]byte, error) {
     return buf.Bytes(), nil
 }
 
-func checkFunc(fn interface{}) (in []reflect.Value, f reflect.Value, ok bool) {
+func checkFunc(fn interface{}) (sh *ServantHandle, ok bool) {
     defer func() {
         if e := recover(); e != nil {
             buffer := bytes.NewBufferString(fmt.Sprint(e))
@@ -183,10 +182,11 @@ func checkFunc(fn interface{}) (in []reflect.Value, f reflect.Value, ok bool) {
     var (
         typeOfError = reflect.TypeOf((*error)(nil)).Elem()
     )
-    f, ok = fn.(reflect.Value)
+    f, ok := fn.(reflect.Value)
     if !ok {
         f = reflect.ValueOf(fn)
     }
+
     t := f.Type()
     if t.NumIn() != 3 { // context/request/response
         return
@@ -200,14 +200,19 @@ func checkFunc(fn interface{}) (in []reflect.Value, f reflect.Value, ok bool) {
     r := t.In(1)
     w := t.In(2)
 
-    ctx := context.Background()
-    t0 := reflect.ValueOf(ctx)
-    t1 := reflect.New(r.Elem())
-    t2 := reflect.New(w.Elem())
+    //ctx := context.Background()
+    //t0 := reflect.ValueOf(ctx)
+    //t1 := reflect.New(r.Elem())
+    //t2 := reflect.New(w.Elem())
 
-    in = []reflect.Value{
-        t0, t1, t2,
-    }
+    //in = []reflect.Value{
+    //    t0, t1, t2,
+    //}
     ok = true
+    sh = &ServantHandle{
+        fn: f,
+        r:  r.Elem(),
+        w:  w.Elem(),
+    }
     return
 }

@@ -8,6 +8,7 @@ message Message {
   optional bytes  payload = 3; // payload
   optional string name    = 4; // 请求名
   optional Dict   dict    = 5; // 键值对
+  optional string error   = 6; // 错误消息
 }
 
 message KeyValue {
