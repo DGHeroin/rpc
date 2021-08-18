@@ -2,7 +2,6 @@ package rpc
 
 import (
     "context"
-    "encoding/binary"
     "github.com/DGHeroin/rpc/pb"
     "log"
     "net"
@@ -53,15 +52,12 @@ func (client *Client) handleMessage(msgType byte, msg *pb.Message) {
     case 1: // request
         client.servant.handleRequest(msg)
     case 2: // response
-        values := parseMessageValue(msg)
-        idBin := values["Id"]
-        id := binary.BigEndian.Uint32(idBin)
-        call := client.mgr.popCall(id)
+        call := client.mgr.popCall(*msg.Id)
         if call == nil {
             log.Println("call 不存在")
             return
         }
-        call.done <- values
+        call.done <- msg
     }
 
 }

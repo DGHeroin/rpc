@@ -25,8 +25,11 @@ type Message struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Action *int32      `protobuf:"varint,1,req,name=action" json:"action,omitempty"`
-	Dict   *Dictionary `protobuf:"bytes,2,req,name=dict" json:"dict,omitempty"`
+	Action  *int32  `protobuf:"varint,1,req,name=action" json:"action,omitempty"`  // 消息类型
+	Id      *uint32 `protobuf:"varint,2,opt,name=id" json:"id,omitempty"`          // 请求id
+	Payload []byte  `protobuf:"bytes,3,opt,name=payload" json:"payload,omitempty"` // payload
+	Name    *string `protobuf:"bytes,4,opt,name=name" json:"name,omitempty"`       // 请求名
+	Dict    *Dict   `protobuf:"bytes,5,opt,name=dict" json:"dict,omitempty"`       // 键值对
 }
 
 func (x *Message) Reset() {
@@ -68,14 +71,35 @@ func (x *Message) GetAction() int32 {
 	return 0
 }
 
-func (x *Message) GetDict() *Dictionary {
+func (x *Message) GetId() uint32 {
+	if x != nil && x.Id != nil {
+		return *x.Id
+	}
+	return 0
+}
+
+func (x *Message) GetPayload() []byte {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *Message) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+func (x *Message) GetDict() *Dict {
 	if x != nil {
 		return x.Dict
 	}
 	return nil
 }
 
-type Pair struct {
+type KeyValue struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -84,8 +108,8 @@ type Pair struct {
 	Value []byte  `protobuf:"bytes,2,req,name=value" json:"value,omitempty"`
 }
 
-func (x *Pair) Reset() {
-	*x = Pair{}
+func (x *KeyValue) Reset() {
+	*x = KeyValue{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_message_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -93,13 +117,13 @@ func (x *Pair) Reset() {
 	}
 }
 
-func (x *Pair) String() string {
+func (x *KeyValue) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Pair) ProtoMessage() {}
+func (*KeyValue) ProtoMessage() {}
 
-func (x *Pair) ProtoReflect() protoreflect.Message {
+func (x *KeyValue) ProtoReflect() protoreflect.Message {
 	mi := &file_message_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -111,35 +135,35 @@ func (x *Pair) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Pair.ProtoReflect.Descriptor instead.
-func (*Pair) Descriptor() ([]byte, []int) {
+// Deprecated: Use KeyValue.ProtoReflect.Descriptor instead.
+func (*KeyValue) Descriptor() ([]byte, []int) {
 	return file_message_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *Pair) GetKey() string {
+func (x *KeyValue) GetKey() string {
 	if x != nil && x.Key != nil {
 		return *x.Key
 	}
 	return ""
 }
 
-func (x *Pair) GetValue() []byte {
+func (x *KeyValue) GetValue() []byte {
 	if x != nil {
 		return x.Value
 	}
 	return nil
 }
 
-type Dictionary struct {
+type Dict struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Pairs []*Pair `protobuf:"bytes,1,rep,name=pairs" json:"pairs,omitempty"`
+	Values []*KeyValue `protobuf:"bytes,1,rep,name=values" json:"values,omitempty"`
 }
 
-func (x *Dictionary) Reset() {
-	*x = Dictionary{}
+func (x *Dict) Reset() {
+	*x = Dict{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_message_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -147,13 +171,13 @@ func (x *Dictionary) Reset() {
 	}
 }
 
-func (x *Dictionary) String() string {
+func (x *Dict) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Dictionary) ProtoMessage() {}
+func (*Dict) ProtoMessage() {}
 
-func (x *Dictionary) ProtoReflect() protoreflect.Message {
+func (x *Dict) ProtoReflect() protoreflect.Message {
 	mi := &file_message_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -165,14 +189,14 @@ func (x *Dictionary) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Dictionary.ProtoReflect.Descriptor instead.
-func (*Dictionary) Descriptor() ([]byte, []int) {
+// Deprecated: Use Dict.ProtoReflect.Descriptor instead.
+func (*Dict) Descriptor() ([]byte, []int) {
 	return file_message_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *Dictionary) GetPairs() []*Pair {
+func (x *Dict) GetValues() []*KeyValue {
 	if x != nil {
-		return x.Pairs
+		return x.Values
 	}
 	return nil
 }
@@ -181,18 +205,21 @@ var File_message_proto protoreflect.FileDescriptor
 
 var file_message_proto_rawDesc = []byte{
 	0x0a, 0x0d, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12,
-	0x02, 0x70, 0x62, 0x22, 0x45, 0x0a, 0x07, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x16,
+	0x02, 0x70, 0x62, 0x22, 0x7d, 0x0a, 0x07, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x16,
 	0x0a, 0x06, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x02, 0x28, 0x05, 0x52, 0x06,
-	0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x22, 0x0a, 0x04, 0x64, 0x69, 0x63, 0x74, 0x18, 0x02,
-	0x20, 0x02, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x70, 0x62, 0x2e, 0x44, 0x69, 0x63, 0x74, 0x69, 0x6f,
-	0x6e, 0x61, 0x72, 0x79, 0x52, 0x04, 0x64, 0x69, 0x63, 0x74, 0x22, 0x2e, 0x0a, 0x04, 0x50, 0x61,
-	0x69, 0x72, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x02, 0x28, 0x09, 0x52,
-	0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20,
-	0x02, 0x28, 0x0c, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x2c, 0x0a, 0x0a, 0x44, 0x69,
-	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x61, 0x72, 0x79, 0x12, 0x1e, 0x0a, 0x05, 0x70, 0x61, 0x69, 0x72,
-	0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x08, 0x2e, 0x70, 0x62, 0x2e, 0x50, 0x61, 0x69,
-	0x72, 0x52, 0x05, 0x70, 0x61, 0x69, 0x72, 0x73, 0x42, 0x07, 0x5a, 0x05, 0x2e, 0x2f, 0x3b, 0x70,
-	0x62,
+	0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0d, 0x52, 0x02, 0x69, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61,
+	0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07, 0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64,
+	0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04,
+	0x6e, 0x61, 0x6d, 0x65, 0x12, 0x1c, 0x0a, 0x04, 0x64, 0x69, 0x63, 0x74, 0x18, 0x05, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x08, 0x2e, 0x70, 0x62, 0x2e, 0x44, 0x69, 0x63, 0x74, 0x52, 0x04, 0x64, 0x69,
+	0x63, 0x74, 0x22, 0x32, 0x0a, 0x08, 0x4b, 0x65, 0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x10,
+	0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x02, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79,
+	0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x02, 0x28, 0x0c, 0x52,
+	0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x2c, 0x0a, 0x04, 0x44, 0x69, 0x63, 0x74, 0x12, 0x24,
+	0x0a, 0x06, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0c,
+	0x2e, 0x70, 0x62, 0x2e, 0x4b, 0x65, 0x79, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x06, 0x76, 0x61,
+	0x6c, 0x75, 0x65, 0x73, 0x42, 0x07, 0x5a, 0x05, 0x2e, 0x2f, 0x3b, 0x70, 0x62,
 }
 
 var (
@@ -209,13 +236,13 @@ func file_message_proto_rawDescGZIP() []byte {
 
 var file_message_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_message_proto_goTypes = []interface{}{
-	(*Message)(nil),    // 0: pb.Message
-	(*Pair)(nil),       // 1: pb.Pair
-	(*Dictionary)(nil), // 2: pb.Dictionary
+	(*Message)(nil),  // 0: pb.Message
+	(*KeyValue)(nil), // 1: pb.KeyValue
+	(*Dict)(nil),     // 2: pb.Dict
 }
 var file_message_proto_depIdxs = []int32{
-	2, // 0: pb.Message.dict:type_name -> pb.Dictionary
-	1, // 1: pb.Dictionary.pairs:type_name -> pb.Pair
+	2, // 0: pb.Message.dict:type_name -> pb.Dict
+	1, // 1: pb.Dict.values:type_name -> pb.KeyValue
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -242,7 +269,7 @@ func file_message_proto_init() {
 			}
 		}
 		file_message_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Pair); i {
+			switch v := v.(*KeyValue); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -254,7 +281,7 @@ func file_message_proto_init() {
 			}
 		}
 		file_message_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Dictionary); i {
+			switch v := v.(*Dict); i {
 			case 0:
 				return &v.state
 			case 1:

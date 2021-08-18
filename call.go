@@ -2,7 +2,7 @@ package rpc
 
 import (
     "context"
-    "fmt"
+    "github.com/DGHeroin/rpc/pb"
     "sync"
 )
 
@@ -12,7 +12,7 @@ type (
     }
     Call struct {
         Id   uint32
-        done chan map[string][]byte
+        done chan *pb.Message
         conn *Conn
     }
     CallManager struct {
@@ -37,12 +37,8 @@ func (call *Call) Call(ctx context.Context, service string, args interface{}, re
     if err != nil {
         return err
     }
-    values := <-call.done
-    if values["error"] != nil {
-        return fmt.Errorf("%s", values["error"])
-    }
-    payload := values["payload"]
-    err = Unmarshal(payload, reply)
+    msg := <-call.done
+    err = Unmarshal(msg.Payload, reply)
     return err
 }
 
@@ -58,7 +54,7 @@ func (m *CallManager) newCall(conn *Conn) *Call {
     call := &Call{
         Id:   m.nexId(),
         conn: conn,
-        done: make(chan map[string][]byte),
+        done: make(chan *pb.Message),
     }
     m.addCall(call)
     return call

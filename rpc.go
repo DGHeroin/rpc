@@ -131,29 +131,14 @@ func CalcCrc(data []byte) (uint32, error) {
 func buildRequest(reqId uint32, service string, payload interface{}) (*pb.Message, error) {
     req := &pb.Message{}
     req.Action = proto.Int32(1)
-    req.Dict = &pb.Dictionary{}
-    // service
-    req.Dict.Pairs = append(req.Dict.Pairs, &pb.Pair{
-        Key:   proto.String("service"),
-        Value: []byte(service),
-    })
-    reqData := make([]byte, 4)
-    binary.BigEndian.PutUint32(reqData, reqId)
-    req.Dict.Pairs = append(req.Dict.Pairs, &pb.Pair{
-        Key:   proto.String("Id"),
-        Value: reqData,
-    })
-    // payload
-    {
-        if data, err := Marshal(payload); err != nil {
-            return nil, err
-        } else {
-            req.Dict.Pairs = append(req.Dict.Pairs, &pb.Pair{
-                Key:   proto.String("payload"),
-                Value: data,
-            })
-        }
+    req.Name = proto.String(service)
+    req.Id = proto.Uint32(reqId)
+    if data, err := Marshal(payload); err != nil {
+        return nil, err
+    } else {
+        req.Payload = data
     }
+
     return req, nil
 }
 
@@ -225,23 +210,4 @@ func checkFunc(fn interface{}) (in []reflect.Value, f reflect.Value, ok bool) {
     }
     ok = true
     return
-}
-func parseMessageValue(msg *pb.Message) map[string][]byte {
-    var values = make(map[string][]byte)
-    for _, pair := range msg.Dict.Pairs {
-        values[*pair.Key] = pair.Value
-    }
-    return values
-}
-func buildMessageValue(values map[string][]byte) *pb.Message {
-    msg := &pb.Message{
-        Dict: &pb.Dictionary{},
-    }
-    for k, v := range values {
-        msg.Dict.Pairs = append(msg.Dict.Pairs, &pb.Pair{
-            Key:   proto.String(k),
-            Value: v,
-        })
-    }
-    return msg
 }

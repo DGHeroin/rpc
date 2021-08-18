@@ -27,8 +27,6 @@ func main()  {
     }
 }
 func onMessage(ctx context.Context, request *shard.SimpleRequest, reply *shard.SimpleReply) error {
- //   log.Println("onMessage", request, reply)
-
     reply.Message = "I got it"
     return nil
 }

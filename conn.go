@@ -53,11 +53,8 @@ func (c *Conn) handleLoop() {
         case <-c.closeCh:
             return
         case msg := <-c.packetReceiveChan:
-            if c.OnMessage == nil {
-                continue
-            }
             msgType := headerTypeCode(msg.header)
-            c.OnMessage(msgType, msg.payload)
+            c.onMessage(msgType, msg.payload)
         default:
         }
     }
@@ -175,4 +172,11 @@ func (c *Conn) Send(msgType byte, msg *pb.Message) error {
     }
     _, err = c.conn.Write(bin)
     return err
+}
+
+func (c *Conn) onMessage(msgType byte, msg *pb.Message) {
+    defer func() {
+        recover()
+    }()
+    c.OnMessage(msgType, msg)
 }

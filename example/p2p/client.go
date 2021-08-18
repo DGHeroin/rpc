@@ -40,7 +40,7 @@ func main() {
             lastVal = now
         }
     }()
-    for i := 0; i < 1000; i++ {
+    for i := 0; i < 100; i++ {
         openOneClient()
     }
     select {
